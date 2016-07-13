@@ -7,6 +7,8 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src ="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.1/simple_statistics.min.js"></script>
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
@@ -20,8 +22,8 @@
             color: #0D0000;
         }
         header {
-            width: 960px;
-            margin: 10px 20px 10px 20px;
+            width: 80%;
+            margin: 10px auto;
         }
         h1 {
             display: inline-block;
@@ -40,8 +42,8 @@
             border: 2px solid #dddedf;
         }
         footer {
-            width: 960px;
-            margin: 10px 20px 10px 20px;
+            width: 80%;
+            margin: 10px auto;
         }
         p {
             font-size: 1em;
@@ -69,6 +71,85 @@
     </footer>
 
     <script>
+        $("h1").html("Housing Ownership in Kentucky");
+       
+        
+        var options = {
+            center: [37.8, -85.8],
+            zoom: 7.4,
+            zoomControl: false
+        }
+        
+        var map = L.map('map', options);
+        
+        $.getJSON('ky_counties_housing.json', function(data){
+            
+            var dataLayer = L.geoJson(data, {
+                style: function(feature){
+                    return{
+                        color: '#dddddd',
+                        weight: 2, 
+                        fillOpacity: 1, 
+                        fillColor: '#1f78b4'
+                    }
+                }
+            }).addTo(map);
+        
+            drawMap(dataLayer);
+        
+        });
+        
+        function drawMap(dataLayer){
+            
+            var breaks = getClassBreaks(dataLayer);
+            
+            dataLayer.eachLayer(function(layer){
+                layer.setStyle({
+                    fillColor: getColor(layer.feature.properties['OWNED_MORT']/layer.feature.properties['OWNER'], breaks)
+                })
+            });
+        }
+        
+        function getClassBreaks(dataLayer){
+            
+            var values =[];
+            
+            dataLayer.eachLayer(function(layer){
+                values.push(layer.feature.properties['OWNED_MORT']/layer.feature.properties['OWNER'])
+            });
+            
+           // console.log(values);
+            
+            var clusters = ss.ckmeans(values, 5);
+            
+            var breaks = clusters.map(function(cluster){
+                console.log(cluster)
+                return [cluster[0], cluster.pop()];
+            });
+            
+            return breaks;
+               console.log(breaks)
+            
+        }
+        
+        function getColor(d, breaks){
+            
+            if (d<= breaks[0][1]){
+                return '#eff3ff';
+            } else if (d <= breaks [1][1]){
+                return '#bdd7e7';
+            } else if (d <= breaks [2][1]){
+                return '#6baed6';
+            } else if (d <= breaks [3][1]){
+                return '#3182bd';   
+            } else if (d <= breaks [4][1]){
+                return '#08519c'
+            }
+        }
+                
+    
+        
+        
         
         // WRITE YOUR CODE JAVASCRIPT CODE HERE
 
