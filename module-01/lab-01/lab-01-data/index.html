@@ -50,6 +50,36 @@
             color: #001323;
         }
         
+        .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(255,255,255, 0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .legend h3{
+            font-size: 1.1em;
+            font-weight: normal;
+            color: #001323;
+            margin: 0 0 10px 0;
+        }
+        
+        .legend span{
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin: 0 10px 4px 0;
+        }
+        
+        .legend label{
+            font-size: 1.1em
+        }
+        
+        .legend label:after{
+            content: '';
+            display: block;
+            clear: both;
+        }
         /* ADD YOUR ADDITIONAL STYLE RULES HERE */
         
     </style>
@@ -80,7 +110,10 @@
             zoomControl: false
         }
         
+        
         var map = L.map('map', options);
+        
+         map.addControl(L.control.zoom( { position: 'topright' }) );
         
         $.getJSON('ky_counties_housing.json', function(data){
             
@@ -108,7 +141,11 @@
                     fillColor: getColor(layer.feature.properties['OWNED_MORT']/layer.feature.properties['OWNER'], breaks)
                 })
             });
+            
+            drawLegend(breaks);
+            
         }
+        
         
         function getClassBreaks(dataLayer){
             
@@ -128,7 +165,7 @@
             });
             
             return breaks;
-               console.log(breaks)
+            //   console.log(breaks)
             
         }
         
@@ -148,7 +185,37 @@
         }
                 
     
-        
+        function drawLegend(breaks){
+            
+            var legend = L.control( {position: 'topleft'});
+            
+            legend.onAdd = function() {
+                
+                var div = L.DomUtil.create('div', 'legend');
+                
+                div.innerHTML = "<h3> % Of Owner Occupied Homes With Mortage</h3>";
+                
+                for(var i = 0; i<breaks.length; i++){
+                    
+                    var color = getColor(breaks[i][0], breaks);
+                    
+                    div.innerHTML +=
+                        '<span style="background:' + color + '"></span>' +
+                        '<label>'+(breaks[i][0]*100).toLocaleString() + 
+                        '&mdash;' +
+                        (breaks[i][1]*100).toLocaleString() + '</labels>'
+                  //  console.log(color)
+                        
+                    
+                
+                }
+                
+                return div;
+                
+            };
+            
+            legend.addTo(map);
+        }
         
         
         // WRITE YOUR CODE JAVASCRIPT CODE HERE
