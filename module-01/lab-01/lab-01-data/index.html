@@ -101,7 +101,8 @@
     </footer>
 
     <script>
-        $("h1").html("Housing Ownership in Kentucky");
+        $("h1").html("Rental Housing Vacancy Rates in Kentucky");
+        $("h2").html("Rate of Vacant for Rent Units to Total Units for Rent")
        
         
         var options = {
@@ -126,9 +127,12 @@
                         fillColor: '#1f78b4'
                     }
                 }
+                
+            
             }).addTo(map);
         
             drawMap(dataLayer);
+            
         
         });
         
@@ -138,35 +142,51 @@
             
             dataLayer.eachLayer(function(layer){
                 layer.setStyle({
-                    fillColor: getColor(layer.feature.properties['OWNED_MORT']/layer.feature.properties['OWNER'], breaks)
+                    fillColor: getColor(layer.feature.properties['VACANT_FOR']/(layer.feature.properties['VACANT_REN']+layer.feature.properties['RENTER']+layer.feature.properties['VACANT_FOR'])*100, breaks)
                 })
+                             
             });
             
             drawLegend(breaks);
-            
+                   
         }
+        
         
         
         function getClassBreaks(dataLayer){
             
             var values =[];
             
-            dataLayer.eachLayer(function(layer){
-                values.push(layer.feature.properties['OWNED_MORT']/layer.feature.properties['OWNER'])
+            dataLayer.eachLayer(function(layer){ 
+                values.push(layer.feature.properties['VACANT_FOR']/(layer.feature.properties['VACANT_REN']+layer.feature.properties['RENTER']+layer.feature.properties['VACANT_FOR'])*100)
+                
+            for(var i = 0; i<values.length; i++){
+            var vacancyRate = values[i];
+                
+            var content = ("<b>" + layer.feature.properties["NAME"] + " County</b><br>");
+            layer.bindPopup(content + "Vacancy Rate: " + (vacancyRate*100).toLocaleString() + "%" )
+            
+            
+            }
+    
+                
             });
             
-           // console.log(values);
+
+            
+            //console.log(vacancy);
             
             var clusters = ss.ckmeans(values, 5);
             
             var breaks = clusters.map(function(cluster){
-                console.log(cluster)
+            //    console.log(cluster)
                 return [cluster[0], cluster.pop()];
             });
             
             return breaks;
             //   console.log(breaks)
             
+    
         }
         
         function getColor(d, breaks){
@@ -193,7 +213,7 @@
                 
                 var div = L.DomUtil.create('div', 'legend');
                 
-                div.innerHTML = "<h3> % Of Owner Occupied Homes With Mortage</h3>";
+                div.innerHTML = "<h3> Percent of Vacant Available Rental Units </h3>";
                 
                 for(var i = 0; i<breaks.length; i++){
                     
@@ -206,8 +226,6 @@
                         (breaks[i][1]*100).toLocaleString() + '</labels>'
                   //  console.log(color)
                         
-                    
-                
                 }
                 
                 return div;
@@ -216,6 +234,13 @@
             
             legend.addTo(map);
         }
+        
+       
+
+      
+            
+            
+        
         
         
         // WRITE YOUR CODE JAVASCRIPT CODE HERE
