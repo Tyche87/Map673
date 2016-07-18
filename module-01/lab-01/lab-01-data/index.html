@@ -3,13 +3,13 @@
 
 <head>
     <meta charset=utf-8 />
-    <title>Lab 01 Template</title>
+    <title>Kentucky Housing Statistics</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
+    <script src="http://code.jquery.com/jquery-3.1.0.min.js"></script>    
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <script src ="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.1/simple_statistics.min.js"></script>
-
+    <script src ="http://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.1/simple_statistics.min.js"></script>
+    
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
@@ -17,37 +17,40 @@
         body {
             margin: 0;
             padding: 0;
-            background: whitesmoke;
+            background: #787878;
             font-family: Lato, sans-serif;
             color: #0D0000;
         }
         header {
             width: 80%;
-            margin: 10px auto;
+            margin: 10px auto 10px auto;
         }
         h1 {
             display: inline-block;
-            margin-right: 20px;
-            color: #001323;
+            margin: 10px auto 10px auto;
+            color: #D8D8D8;
         }
         h2 {
             display: inline-block;
-            color: #001323;
+            margin: 10px auto 10px auto;
+            color: #D8D8D8;
         }
         #map {
-            width: 960px;
+            width: 80%;
             height: 540px;
-            margin: 10px 20px 10px 20px;
-            background: whitesmoke;
+            margin: 10px auto 10px auto;
+            background: #D8D8D8;
             border: 2px solid #dddedf;
+            
         }
         footer {
             width: 80%;
-            margin: 10px auto;
+            margin: 10px 10%;
         }
         p {
             font-size: 1em;
-            color: #001323;
+            color: #D8D8D8;
+            padding: auto;
         }
         
         .legend {
@@ -80,7 +83,6 @@
             display: block;
             clear: both;
         }
-        /* ADD YOUR ADDITIONAL STYLE RULES HERE */
         
     </style>
 </head>
@@ -94,10 +96,14 @@
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
-        </p>
+        <p>Map authored by Tyler Hegwood</p>
+        <p>Kentucky housing statistics sourced from 2010 US Census. </p>
+        <b>What is the purpose of the map?</b><br>The purpose of this map is to visualize a set of housing data in Kentucky.<br><br> 
+        <b>How does cartographic symbology influence or distort the representation of the data?</b><br>
+            The chloropleth color scheme makes apparent certain trends that may be unclear within just the data itself. Using the county borders as containers to represent the rates I've chosen to represent may be skewed due to great variances in rental markets among rural and urban settings.<br><br> 
+        <b>Does the map have a point of view or support an argument?</b><br>
+        The map may support multiple arguments, depending on how it is being presented. As a stand alone image and map, I would say it needs more geographic information so support an argument. Speaking for myself or anyone unfamiliar with Kentucky's population/economic dispersion, which may be the best way to objectively react to it, would have a hard time drawing a conclusion other than it's literal representation.    
+        
     </footer>
 
     <script>
