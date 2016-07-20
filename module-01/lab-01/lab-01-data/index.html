@@ -134,8 +134,8 @@
                     }
                 }
                 
-            
             }).addTo(map);
+            
         
             drawMap(dataLayer);
             
@@ -147,15 +147,25 @@
             var breaks = getClassBreaks(dataLayer);
             
             dataLayer.eachLayer(function(layer){
+                
+                var props = layer.feature.properties,
+                    
+                    vacancyRate = (props['VACANT_FOR']/(props['VACANT_REN']+props['RENTER']+props['VACANT_FOR'])*100);
+                
                 layer.setStyle({
-                    fillColor: getColor(layer.feature.properties['VACANT_FOR']/(layer.feature.properties['VACANT_REN']+layer.feature.properties['RENTER']+layer.feature.properties['VACANT_FOR'])*100, breaks)
+                    fillColor: getColor(vacancyRate, breaks)
                 })
-                             
+                
+                 var content = ("<b>" + layer.feature.properties["NAME"] + " County</b><br>");
+                layer.bindPopup(content + "Vacancy Rate: " + (vacancyRate*100).toLocaleString() + "%" )
+                
+                
             });
-            
-            drawLegend(breaks);
-                   
+                
+              drawLegend(breaks);
+                             
         }
+
         
         
         
@@ -164,22 +174,10 @@
             var values =[];
             
             dataLayer.eachLayer(function(layer){ 
-                values.push(layer.feature.properties['VACANT_FOR']/(layer.feature.properties['VACANT_REN']+layer.feature.properties['RENTER']+layer.feature.properties['VACANT_FOR'])*100)
-                
-            for(var i = 0; i<values.length; i++){
-            var vacancyRate = values[i];
-                
-            var content = ("<b>" + layer.feature.properties["NAME"] + " County</b><br>");
-            layer.bindPopup(content + "Vacancy Rate: " + (vacancyRate*100).toLocaleString() + "%" )
+                values.push(layer.feature.properties['VACANT_FOR']/(layer.feature.properties['VACANT_REN']+layer.feature.properties['RENTER']+layer.feature.properties['VACANT_FOR'])*100)            
             
-            
-            }
-    
-                
             });
-            
-
-            
+        
             //console.log(vacancy);
             
             var clusters = ss.ckmeans(values, 5);
