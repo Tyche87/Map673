@@ -41,6 +41,13 @@
             background: whitesmoke;
             border: 2px solid #dddedf;
         }
+        #ui-controls{
+            margin-left: 10%; 
+        }
+        #ui-controls label {
+            font-size: 1em;
+            margin-right: 5px
+        }
         footer {
             padding: 6px 10%;
             width: 80%;
@@ -80,6 +87,7 @@
             max-width: 160px;   
         }
         
+        
     </style>
 </head>
 
@@ -88,7 +96,14 @@
         <h1>Map Title</h1>
         <h2>Map Subtitle</h2>
     </header>
-
+    <div id ='ui-controls'>
+        <label> Choose a data attribute:</label>
+        <select id = "occupied">
+            <option value="OWNED_MORT" selected>owned with mortgage</option>
+            <option value="OWNED_FREE" >owned free and clear</option>
+            <option value="RENTER" >rented</option>
+        </select>
+    </div>
     <div id='map'></div>
 
     <footer>
@@ -127,6 +142,8 @@
             }).addTo(map);
             
             drawMap();
+            
+            buildUI();
               
         });
         
@@ -210,6 +227,13 @@
             };
 
             legend.addTo(map);
+        }
+        
+        function buildUI(){
+            $('select[id="occupied"]').change(function(){
+                attribute = $(this).val();
+                drawMap();
+            })
         }
 
     </script>
