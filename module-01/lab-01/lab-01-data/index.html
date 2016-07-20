@@ -156,7 +156,7 @@
                     fillColor: getColor(vacancyRate, breaks)
                 })
                 
-                 var content = ("<b>" + layer.feature.properties["NAME"] + " County</b><br>");
+                 var content = ("<b>" + props["NAME"] + " County</b><br>");
                 layer.bindPopup(content + "Vacancy Rate: " + (vacancyRate*100).toLocaleString() + "%" )
                 
                 
