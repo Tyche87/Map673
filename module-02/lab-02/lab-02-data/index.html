@@ -34,6 +34,10 @@
             display: inline-block;
             color: #001323;
         }
+        h3{
+            display: inline-block;
+            color: #001323;
+        }
         #map {
             width: 80%;
             height: 540px;
@@ -62,6 +66,7 @@
             background: rgba(255,255,255,0.8);
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 5px;
+            width: 160px;
         }
         .legend h3 {
             font-size: 1.1em;
@@ -118,10 +123,9 @@
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
-        </p>
+        <p>Map authored by Tyler Hegwood</p>
+        <p>Housing Data Sourced from the 2010 US Census</p>
+        <p></p>
     </footer>
 
     <script>
@@ -136,7 +140,7 @@
         }
         var map = L.map('map', options);
         
-        map.addControl( L.control.zoom({ position: 'topright' }));
+        //map.addControl( L.control.zoom({ position: 'topright' }));
         
         var dataLayer,
             attribute = "OWNED_MORT",
@@ -163,6 +167,13 @@
               
         });
         
+        var labels = { 
+            "OCCUPIED": "Occupied units",
+            "OWNED_MORT": "% occupied housing units owned with mortgage",
+            "OWNED_FREE": "% occupied housing units owned free and clear",
+            "RENTER": "% occupied housing units rented"
+        }; 
+        
         function drawMap() {
             
             var breaks = getClassBreaks();
@@ -176,7 +187,7 @@
                                         props[norm], breaks)
                 });
                 layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
-                                attribute + ": " +
+                                labels[attribute] + ": " +
                                 ((props[attribute]/props[norm])*100).toLocaleString()+"%");
                 
                 layer.on('mouseover', function(){
@@ -232,14 +243,14 @@
         function drawLegend() {
             
             var legend = L.control({position: 'topleft'});
-
+    
             legend.onAdd = function (map) {
                 
                 var div = L.DomUtil.create('div', 'legend');
                                
-                return div;
-                    
+                return div;                
             };
+            
 
             legend.addTo(map);
         }
@@ -252,8 +263,10 @@
         }
         
         function updateLegend(breaks){
-                var legend = $('.legend');
-                legend.html("<h3>" + attribute + " per " + norm + "</h3>"); 
+            
+                var legend = $('.legend').html("<h3>" + labels[attribute] + "</h3><ul>");
+                //var legend = $('.legend')
+                //legend.html("<h3>" + labels[attribute] + " per " + norm + "</h3>"); 
                 
                 for (var i = 0; i < breaks.length; i++) {
             
