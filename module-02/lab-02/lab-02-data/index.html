@@ -86,6 +86,17 @@
         .leaflet-popup-content {
             max-width: 160px;   
         }
+        .info{
+            padding: 6px 8px;
+            font-size: 1em;
+            background:rgba(255,255,255,.8);
+            box-shadow: 0 0 015px rgba(0,0,0,.2);
+            border-radius: 5px;
+            text-align: right;
+        }
+        .info h3{
+            margin: 0;
+        }
         
         
     </style>
@@ -118,6 +129,9 @@
         var options = {
             center: [37.8, -85.8],
             zoom: 7.4,
+            minZoom: 7.4,
+            maxZoom: 7.4,
+            dragging: false,
             zoomControl: false
         }
         var map = L.map('map', options);
@@ -143,6 +157,7 @@
             
             drawLegend();
             drawMap();
+            drawInfo();
             buildUI();
             
               
@@ -162,7 +177,19 @@
                 });
                 layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
                                 attribute + ": " +
-                                ((props[attribute]/props[norm])*100).toLocaleString()+"%");  
+                                ((props[attribute]/props[norm])*100).toLocaleString()+"%");
+                
+                layer.on('mouseover', function(){
+                    dataLayer.on('mouseover',function(){
+                        $(".info").show();
+                    });
+                    dataLayer.on('mouseout',function(){
+                        $(".info").hide();
+                    });
+                    updateInfo(this);
+                });
+                
+                
             });
             updateLegend(breaks);
             
@@ -238,6 +265,31 @@
                         (breaks[i][1]*100).toLocaleString() + '</label>');
                 }
         }
+        
+        function drawInfo(){
+            var info = L.control( {position: 'topright'});
+            
+            info.onAdd = function(map) {
+                
+                var div = L.DomUtil.create('div', 'info');
+                
+                return div;
+            }
+            
+            info.addTo(map);
+            $(".info").hide();
+        }
+        
+        function updateInfo(layer){
+            var props = layer.feature.properties;
+            
+            var html =  "<h3>"+props['NAME']+" County</h3>"+
+                        "total # occupied units: <b>"+ props["OCCUPIED"]+"</b><br>"+
+                        "# owned with mortgage or loan: <b>"+ props["OWNED_MORT"]+"</b><br>"+
+                        "# owned free and clear: <b>"+ props["OWNED_FREE"]+"</b><br>"+
+                        "# occupied by renters: <b>"+ props["RENTER"]+"</b>"
+            $(".info").html(html);
+            }
 
     </script>
     
