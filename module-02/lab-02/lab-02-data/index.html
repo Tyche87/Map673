@@ -34,13 +34,9 @@
             display: inline-block;
             color: #001323;
         }
-        h3{
-            display: inline-block;
-            color: #001323;
-        }
         #map {
             width: 80%;
-            height: 540px;
+            height: 700px;
             margin: 10px 10%;
             background: whitesmoke;
             border: 2px solid #dddedf;
@@ -69,8 +65,8 @@
             width: 160px;
         }
         .legend h3 {
-            font-size: 1.1em;
-            font-weight: normal;
+            font-size: 1em;
+            font-weight: bold;
             color: #001323;
             margin: 0 0 10px 0;
         }
@@ -98,6 +94,7 @@
             box-shadow: 0 0 015px rgba(0,0,0,.2);
             border-radius: 5px;
             text-align: right;
+            
         }
         .info h3{
             margin: 0;
@@ -109,15 +106,18 @@
 
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Housing Vacancies in the State of Kentucky</h1>
+        <h2>2010 Census</h2>
     </header>
     <div id ='ui-controls'>
         <label> Choose a data attribute:</label>
-        <select id = "occupied">
-            <option value="OWNED_MORT" selected>owned with mortgage</option>
-            <option value="OWNED_FREE" >owned free and clear</option>
-            <option value="RENTER" >rented</option>
+        <select id = "vacant"> 
+            <option value="VACANT_FOR" selected>vacant units for rent</option>
+            <option value="VACANT_REN" >vacant units rented not occupied</option>
+            <option value="VACANT_FO2" >vacant units for sale</option>
+            <option value="VACANT_SOL" >vacant units sole not occupied</option>
+            <option value="VACANT_SEA" >vacant units used seasonally</option>
+            <option value="VACANT_MIG" >vacant units used for migratory workers</option>
         </select>
     </div>
     <div id='map'></div>
@@ -143,8 +143,8 @@
         //map.addControl( L.control.zoom({ position: 'topright' }));
         
         var dataLayer,
-            attribute = "OWNED_MORT",
-            norm = "OCCUPIED";
+            attribute = "VACANT_FOR",
+            norm = "VACANT";
         
         $.getJSON("ky_counties_housing.json", function(data) {
             
@@ -168,10 +168,13 @@
         });
         
         var labels = { 
-            "OCCUPIED": "Occupied units",
-            "OWNED_MORT": "% occupied housing units owned with mortgage",
-            "OWNED_FREE": "% occupied housing units owned free and clear",
-            "RENTER": "% occupied housing units rented"
+            "VACANT": "% total vacant units",
+            "VACANT_FOR": "% vacant housing units for rent",
+            "VACANT_FO2": "% vacant housing units for sale",
+            "VACANT_SEA": "% vacant seasonal housing units",
+            "VACANT_REN": "% vacant units rented not occupied",
+            "VACANT_SOL": "% vacant units sole not occupied",
+            "VACANT_MIG": "% vacant units used for migratory workers",
         }; 
         
         function drawMap() {
@@ -186,7 +189,7 @@
                     fillColor: getColor(props[attribute]/
                                         props[norm], breaks)
                 });
-                layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
+                layer.bindPopup("<b>"+props["NAME"]+" County</b><br>" +
                                 labels[attribute] + ": " +
                                 ((props[attribute]/props[norm])*100).toLocaleString()+"%");
                 
@@ -256,7 +259,7 @@
         }
         
         function buildUI(){
-            $('select[id="occupied"]').change(function(){
+            $('select[id="vacant"]').change(function(){
                 attribute = $(this).val();
                 drawMap();
             })
@@ -297,10 +300,14 @@
             var props = layer.feature.properties;
             
             var html =  "<h3>"+props['NAME']+" County</h3>"+
-                        "total # occupied units: <b>"+ props["OCCUPIED"]+"</b><br>"+
-                        "# owned with mortgage or loan: <b>"+ props["OWNED_MORT"]+"</b><br>"+
-                        "# owned free and clear: <b>"+ props["OWNED_FREE"]+"</b><br>"+
-                        "# occupied by renters: <b>"+ props["RENTER"]+"</b>"
+                        "total # vacant units: <b>"+ props["VACANT"]+"</b><br>"+
+                        "# vacant units listed for rent: <b>"+ props["VACANT_FOR"]+"</b><br>"+
+                        "# vacant units rented not occupied: <b>"+ props["VACANT_REN"]+"</b><br>"+
+                        "# vacant units listed for sale: <b>"+ props["VACANT_FO2"]+"</b><br>"+
+                        "# vacant units sole not occupied: <b>"+ props["VACANT_SOL"]+"</b><br>"+
+                        "# vacant units used seasonally: <b>"+ props["VACANT_SEA"]+"</b><br>"+
+                        "# vacant units used for migratory workers: <b>"+ props["VACANT_MIG"]+"</b><br>"
+                        
             $(".info").html(html);
             }
 
