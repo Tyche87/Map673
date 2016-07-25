@@ -39,7 +39,7 @@
             height: 700px;
             margin: 10px 10%;
             background: whitesmoke;
-            border: 2px solid #dddedf;
+            border: 2px solid #CACACA;
         }
         #ui-controls{
             margin-left: 10%; 
@@ -94,11 +94,11 @@
             box-shadow: 0 0 015px rgba(0,0,0,.2);
             border-radius: 5px;
             text-align: right;
-            
         }
         .info h3{
             margin: 0;
         }
+
         
         
     </style>
@@ -139,9 +139,7 @@
             zoomControl: false
         }
         var map = L.map('map', options);
-        
-        //map.addControl( L.control.zoom({ position: 'topright' }));
-        
+                
         var dataLayer,
             attribute = "VACANT_FOR",
             norm = "VACANT";
@@ -156,14 +154,14 @@
                             fillOpacity: 1,
                             fillColor: '#1f78b4'
                         };
-                }          
+                     
+                }        
             }).addTo(map);
             
             drawLegend();
             drawMap();
             drawInfo();
-            buildUI();
-            
+            buildUI();  
               
         });
         
@@ -184,11 +182,25 @@
             dataLayer.eachLayer(function(layer) {
                 
                 var props = layer.feature.properties;
-                
+        
                 layer.setStyle({
                     fillColor: getColor(props[attribute]/
                                         props[norm], breaks)
                 });
+                
+                layer.on('mouseover', function(){
+                        layer.setStyle({
+                        color: '#FFFF00',
+                        });
+                });
+                
+                layer.on('mouseout', function(){
+                        layer.setStyle({
+                        color: '#dddddd',
+                    });
+                });
+            
+                
                 layer.bindPopup("<b>"+props["NAME"]+" County</b><br>" +
                                 labels[attribute] + ": " +
                                 ((props[attribute]/props[norm])*100).toLocaleString()+"%");
@@ -197,18 +209,25 @@
                     dataLayer.on('mouseover',function(){
                         $(".info").show();
                     });
+                    
                     dataLayer.on('mouseout',function(){
                         $(".info").hide();
                     });
+                    
+
+                
                     updateInfo(this);
+                    
                 });
-                
-                
-            });
-            updateLegend(breaks);
             
-        }
+        });
+                
+            updateLegend(breaks)
         
+        };
+        
+        
+            
         function getClassBreaks() {
             
             var values = [];
@@ -264,6 +283,7 @@
                 drawMap();
             })
         }
+            
         
         function updateLegend(breaks){
             
@@ -309,7 +329,13 @@
                         "# vacant units used for migratory workers: <b>"+ props["VACANT_MIG"]+"</b><br>"
                         
             $(".info").html(html);
-            }
+            
+            };
+            
+        
+            
+        
+
 
     </script>
     
