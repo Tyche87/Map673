@@ -144,9 +144,10 @@
             attribute = "VACANT_FOR",
             norm = "VACANT";
     
-    //    
+    //JQuery method to import GeoJSON data file useable in this lab      
         $.getJSON("ky_counties_housing.json", function(data) {
-            
+        
+    //Instantiate geoJson map with basic style options          
             dataLayer = L.geoJson(data, {
                  style: function(feature) {
                     return {
@@ -154,11 +155,11 @@
                             weight: 2,
                             fillOpacity: 1,
                             fillColor: '#1f78b4'
-                        };
-                     
+                    };
                 }        
             }).addTo(map);
             
+    //'Function Junction' where the main operating functions are called to build the project         
             drawLegend();
             drawMap();
             drawInfo();
@@ -176,6 +177,10 @@
             "VACANT_MIG": "% vacant units used for migratory workers",
         }; 
         
+    //content of drawMap function where layers are colored by getClassBreaks function from below, as well as
+    //layer mouseover/out highlight method, popup is bound, functionality to show or hide info box based on 
+    // whether user is moused over map layer, and functions called to update info box and legend breaks based on user
+    //data selection     
         function drawMap() {
             
             var breaks = getClassBreaks();
@@ -216,8 +221,6 @@
                     dataLayer.on('mouseout',function(){
                         $(".info").hide();
                     });
-                    
-
                 
                     updateInfo(this);
                     
@@ -230,7 +233,7 @@
         };
         
         
-            
+    //function to calculate and retutn class breaks to the drawMap function using the ckmeans clustering method from the simple statistics js library          
         function getClassBreaks() {
             
             var values = [];
@@ -250,6 +253,8 @@
             
         }   
         
+    //getColor function content that uses the breaks establashed above to deliniate color codes for each layer based on the 
+    //clusters generated with the ck means method
         function getColor(d, breaks) {
             
             if(d <= breaks[0][1]) {
@@ -265,6 +270,7 @@
             }
         }
         
+    //establish legend and call legend style from .legend css class     
         function drawLegend() {
             
             var legend = L.control({position: 'topleft'});
@@ -280,6 +286,7 @@
             legend.addTo(map);
         }
         
+    //UI data selector build using jQuery select and change event    
         function buildUI(){
             $('select[id="vacant"]').change(function(){
                 attribute = $(this).val();
@@ -287,7 +294,7 @@
             })
         }
             
-        
+    //using jQuery to effect changes to .legend class styles from user data selection    
         function updateLegend(breaks){
             
                 var legend = $('.legend').html("<h3>" + labels[attribute] + "</h3><ul>");
@@ -305,6 +312,7 @@
                 }
         }
         
+    //info box generated using leaflet control method     
         function drawInfo(){
             var info = L.control( {position: 'topright'});
             
@@ -319,6 +327,7 @@
             $(".info").hide();
         }
         
+    //content related to the info box      
         function updateInfo(layer){
             var props = layer.feature.properties;
             
