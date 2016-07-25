@@ -143,7 +143,8 @@
         var dataLayer,
             attribute = "VACANT_FOR",
             norm = "VACANT";
-        
+    
+    //    
         $.getJSON("ky_counties_housing.json", function(data) {
             
             dataLayer = L.geoJson(data, {
@@ -191,12 +192,14 @@
                 layer.on('mouseover', function(){
                         layer.setStyle({
                         color: '#FFFF00',
-                        });
+                        weight: 4
+                        }).bringToFront();
                 });
                 
                 layer.on('mouseout', function(){
                         layer.setStyle({
                         color: '#dddddd',
+                        weight: 2    
                     });
                 });
             
