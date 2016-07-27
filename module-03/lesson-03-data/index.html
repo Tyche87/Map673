@@ -66,6 +66,7 @@
         
         map.addLayer(tiles);
         
+        var dataLayer;
     
         // declare global variables
         
@@ -75,23 +76,107 @@
                 download: true,
                 header: true, 
                 complete: function(data){
-                    console.log(data);
+                    
+                    processData(states, data);
                 }
             })
         });
         
-    
-        // AJAX requests to load data files (a GeoJSON and a CSV file)
-
+        
         // function to process/bind CSV attribute data to geometry data
+
+        function processData(states, data){
+            
+            for(var state in states.features){
+                
+                
+                for(var d in data.data){
+                    var stateFIP = states.features[state].properties.STATEFP,
+                        dataFIP = data.data[d].STATE_FIP;
+                    
+                    if(stateFIP === dataFIP) {
+                        
+                        states.features[state].properties = data.data[d];
+                    }
+                }
+            }
+            
+            drawMap(states);
+        }
+        
+        function drawMap(states){
+            dataLayer = L.geoJson(states, {
+                style: function(feature){
+                    return {
+                        color: 'black',
+                        weight: 1,
+                        fillOpacity: 1,
+                        fillColor: 'blue'
+                    };
+                } 
+                
+            }).addTo(map);
+            
+            var breaks = getClassBreaks();
+            
+            updateMap(breaks)
+        }
 
         // function to draw the geometries to the map
 
         // function to update the map (once for the initial data view and then again to update the map per the user's request)
+        
+        function updateMap(breaks) {
+            
+            dataLayer.eachLayer(function(layer){
+                
+                layer.setStyle({
+                    fillColor : getColor(Number(layer.feature.properties['2001']), breaks)
+                });
+                
+            })
+            
+        }
+        
+        
+        // function gets the class breaks
+        function getClassBreaks(){
+            
+            var values = [];
+            
+            dataLayer.eachLayer(function(layer){
+                
+                for(var i = 2001; i <= 2013; i++){
+                    
+                    var value = layer.feature.properties[String(i)];
+                    values.push(Number(value));
+                }
+                
+                
+            });
+            
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            
+            return breaks;
 
-        // function gets the class breaks   
-
+        } 
+        
         // function to get the color value
+        function getColor(d, breaks){
+            
+            if(d <= breaks[1]){
+                return '#f2f0f7';
+            }else if (d <= breaks[2]) {
+                return '#cbc9e2';
+            }else if (d <= breaks[3]) {
+                return '#9e9ac8';
+            }else if (d <= breaks[4]) {
+                return '#756bb1';
+            }else if (d <= breaks[5]) {
+                return '#54278f'
+            }
+        
+        }
 
         // function to draw the legend
 
