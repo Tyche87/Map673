@@ -7,6 +7,7 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.0/simple_statistics.min.js"></script>
 
@@ -44,6 +45,7 @@
     <script>
         
          // instantiate the Leaflet map
+                
         var options = {
             center: [38.2, -94],
             zoom: 4,
@@ -53,13 +55,32 @@
             zoomControl: true
         }
         var map = L.map('map', options);
+         
+        var tiles  = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
+	       attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	       subdomains: 'abcd',
+            minZoom: 0,
+	       maxZoom: 20,
+	       ext: 'png'
+        });
         
-        // instantiate the Leaflet map
-
-        // load map tiles and add to map
-
+        map.addLayer(tiles);
+        
+    
         // declare global variables
-
+        
+        $.getJSON("us-states.json", function(states){
+            
+            Papa.parse("states-unemployment.csv",{
+                download: true,
+                header: true, 
+                complete: function(data){
+                    console.log(data);
+                }
+            })
+        });
+        
+    
         // AJAX requests to load data files (a GeoJSON and a CSV file)
 
         // function to process/bind CSV attribute data to geometry data
