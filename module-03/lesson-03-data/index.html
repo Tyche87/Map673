@@ -178,7 +178,7 @@
             
             var breaks = getClassBreaks();
             
-            updateMap(breaks);
+            updateMap(breaks, '2001');
             drawLegend(breaks);
             createSliderUI(breaks);
         }
@@ -187,12 +187,12 @@
 
         // function to update the map (once for the initial data view and then again to update the map per the user's request)
         
-        function updateMap(breaks) {
+        function updateMap(breaks, attribute) {
             
             dataLayer.eachLayer(function(layer){
                 
                 layer.setStyle({
-                    fillColor : getColor(Number(layer.feature.properties['2001']), breaks)
+                    fillColor : getColor(Number(layer.feature.properties[attribute]), breaks)
                 });
                 
             })
@@ -252,7 +252,7 @@
             };
             
             legendControl.addTo(map);
-            var legend = $('.legend').html("<h3>US Unemployment Rates</h3><ul>");
+            var legend = $('.legend').html("<h3><span>2001</span>US Unemployment Rates</h3><ul>");
             
             for(var i = 0; i < breaks.length -1; i++){
                 
@@ -268,21 +268,31 @@
         // function to create the UI
         function createSliderUI(breaks){
             
-            var slideControl = L.control({ position: 'bottomleft'});
+            var sliderControl = L.control({ position: 'bottomleft'});
             
             sliderControl.onAdd = function(map){
                 
-                var slider - L.DomUtil.get("ui-controls");
+                var slider = L.DomUtil.get("ui-controls");
                 
                     L.DomEvent.addListener(slider, 'mousedown',function(e){
                         
-                        L.DomEvent.stopPropegation(e);
+                        L.DomEvent.stopPropagation(e);
+                        
                     });
                 return slider;
             }
             
             sliderControl.addTo(map);
+            
+            $(".year-slider").on("input change", function(){
+                
+                var attribute = $(this).val();
+                updateMap(breaks, attribute);
+                $(".legend h3 span").html(attribute);
+            })
         }
+        
+        
         
 
     </script>
