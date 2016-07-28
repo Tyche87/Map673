@@ -34,13 +34,72 @@
             width: 100%;
             top: 0;
             bottom: 0;
-        }    
+        } 
+        .legend{
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75,75,75,0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 160px;
+        }
+        .legend h3{
+            font-size: 1.1em;
+            font-weight: bold;
+            line-height: 1em;
+            color: whitesmoke;
+            margin: 0;
+        }
+        .legend ul{
+            list-style-type: none;
+            padding: 0;
+            margin: 12px 4px 0;
+        }
+        .legend li{
+            height: 22px;
+        }
+        .legend span {
+            width: 30px;
+            height: 20px;
+            float: left;
+            margin-right: 10px 
+        }
+        #ui-controls{
+            width: 176px;
+            padding: 8px 25px 8px 15px;
+            background: rgba(75,75,75,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            color: whitesmoke;
+        }
+        #ui-controls .min{
+            float: left;
+        }
+        #ui-controls .max{
+            float: right;
+            margin-right: -15px;
+        }
+        .year-slider{
+            width: 100%;
+        }
+        label{
+            font-size: 1.1em;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
     <h1>Map Title Goes Here</h1>
     <div id='map'></div>
+    
+    <div id="ui-controls">
+        <label><span class="min">2001</span><span class="max">2013</span>
+            <input type= "range" min = "2001", max = "2013",
+                   value = "2001", step= "1", class="year-slider">
+        </label>
+    </div>
     
     <script>
         
@@ -119,7 +178,9 @@
             
             var breaks = getClassBreaks();
             
-            updateMap(breaks)
+            updateMap(breaks);
+            drawLegend(breaks);
+            createSliderUI(breaks);
         }
 
         // function to draw the geometries to the map
@@ -179,8 +240,50 @@
         }
 
         // function to draw the legend
+        function drawLegend(breaks){
+            
+            var legendControl = L.control({position: 'topright'});
+            
+            legendControl.onAdd = function(map){
+                
+                var div = L.DomUtil.create('div', 'legend');
+                
+                return div;
+            };
+            
+            legendControl.addTo(map);
+            var legend = $('.legend').html("<h3>US Unemployment Rates</h3><ul>");
+            
+            for(var i = 0; i < breaks.length -1; i++){
+                
+                var color = getColor(breaks[i + 1], breaks);
+                $('.legend ul').append('<li><span style ="background:' + color + '"></span> ' + 
+                    breaks[i] + '&mdash; ' +
+                    breaks[i +1] + '</li>');
+            }
+            
+            legend.append("</ul>")
+        }
 
         // function to create the UI
+        function createSliderUI(breaks){
+            
+            var slideControl = L.control({ position: 'bottomleft'});
+            
+            sliderControl.onAdd = function(map){
+                
+                var slider - L.DomUtil.get("ui-controls");
+                
+                    L.DomEvent.addListener(slider, 'mousedown',function(e){
+                        
+                        L.DomEvent.stopPropegation(e);
+                    });
+                return slider;
+            }
+            
+            sliderControl.addTo(map);
+        }
+        
 
     </script>
     
