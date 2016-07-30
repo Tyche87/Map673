@@ -162,26 +162,29 @@
             
             drawMap(counties);
         }
-        
+
         function drawMap(counties){
             dataLayer = L.geoJson(counties, {
                 style: function(feature){
                     return {
                         color: 'blue',
                         weight: 1,
-                        fillOpacity: .7,
+                        fillOpacity: .9,
                         fillColor: 'blue'
                     };
-                } 
-                
-            }).addTo(map);
+                    
+                }
             
+            }).addTo(map);
+                        
             var breaks = getClassBreaks();
             
             updateMap(breaks, '2000');
             drawLegend(breaks);
             createSliderUI(breaks);
+            
         }
+
 
         // function to draw the geometries to the map
 
@@ -194,6 +197,19 @@
                 layer.setStyle({
                     fillColor : getColor(Number(layer.feature.properties[attribute]), breaks)
                 });
+                
+                layer.on('mouseover', function(){
+                        layer.setStyle({
+                        color: '#FFFF00',
+                        weight: 2
+                        }).bringToFront();
+                });
+                layer.on('mouseout', function(){
+                        layer.setStyle({
+                        color: 'blue',
+                        weight: 1    
+                        })
+                })
                 
             })
             
