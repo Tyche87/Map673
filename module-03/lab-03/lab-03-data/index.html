@@ -63,7 +63,7 @@
             width: 30px;
             height: 20px;
             float: left;
-            margin-right: 10px 
+            margin-right: 10px;
         }
         #ui-controls{
             width: 176px;
@@ -95,9 +95,9 @@
     <div id='map'></div>
     
     <div id="ui-controls">
-        <label><span class="min">2001</span><span class="max">2013</span>
-            <input type= "range" min = "2001", max = "2013",
-                   value = "2001", step= "1", class="year-slider">
+        <label><span class="min">2000</span><span class="max">2013</span>
+            <input type= "range" min = "2000", max = "2013",
+                   value = "2000", step= "1", class="year-slider">
         </label>
     </div>
     
@@ -151,7 +151,7 @@
                 
                 for(var d in data.data){
                     var countyFIP = counties.features[county].properties.COUNTY_FIP,
-                        dataFIP = data.data[d].NAME;
+                        dataFIP = data.data[d].CNTY;
                     
                     if(countyFIP === dataFIP) {
                         
@@ -169,7 +169,7 @@
                     return {
                         color: 'blue',
                         weight: 1,
-                        fillOpacity: 1,
+                        fillOpacity: .7,
                         fillColor: 'blue'
                     };
                 } 
@@ -207,7 +207,7 @@
             
             dataLayer.eachLayer(function(layer){
                 
-                for(var i = 2001; i <= 2013; i++){
+                for(var i = 2000; i <= 2013; i++){
                     
                     var value = layer.feature.properties[String(i)];
                     values.push(Number(value));
@@ -216,7 +216,7 @@
                 
             });
             
-            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.801, 1]);
             
             return breaks;
 
@@ -252,7 +252,7 @@
             };
             
             legendControl.addTo(map);
-            var legend = $('.legend').html("<h3><span>2001</span>US Unemployment Rates</h3><ul>");
+            var legend = $('.legend').html("<h3><span>2000</span>Kentucky Unemployment Rates</h3><ul>");
             
             for(var i = 0; i < breaks.length -1; i++){
                 
