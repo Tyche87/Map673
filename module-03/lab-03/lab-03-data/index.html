@@ -91,21 +91,25 @@
             max-width: 160px;   
         }
         .info{
+            color: whitesmoke;
+            width:  80px;
             padding: 6px 8px;
+            margin: auto 10% 20% auto;
             font-size: 1em;
-            background:rgba(255,255,255,.8);
+            background:rgba(75,75,75,.8);
             box-shadow: 0 0 015px rgba(0,0,0,.2);
             border-radius: 5px;
-            text-align: right;
+            text-align: left;
         }
         .info h3{
             margin: 0;
+            text-align: center
         }
     </style>
 </head>
 
 <body>
-    <h1>Map Title Goes Here</h1>
+    <h1>Kentucky Unemployment Rates 2000 - 2013</h1>
     <div id='map'></div>
     
     <div id="ui-controls">
@@ -150,6 +154,7 @@
                 complete: function(data){
                     
                     processData(counties, data);
+                    updateInfo(counties);
                 }
             })
         });
@@ -170,6 +175,8 @@
                         
                         counties.features[county].properties = data.data[d];
                     }
+                    
+                    //console.log(data.data[d])
                 }
             }
             
@@ -192,22 +199,13 @@
                         
             var breaks = getClassBreaks();
             
+            
             updateMap(breaks, '2000');
             drawLegend(breaks);
             createSliderUI(breaks);
+            drawInfo();
             
         }
-        
-        var labels = { 
-            "VACANT": "% total vacant units",
-            "VACANT_FOR": "% vacant housing units for rent",
-            "VACANT_FO2": "% vacant housing units for sale",
-            "VACANT_SEA": "% vacant seasonal housing units",
-            "VACANT_REN": "% vacant units rented not occupied",
-            "VACANT_SOL": "% vacant units sole not occupied",
-            "VACANT_MIG": "% vacant units used for migratory workers",
-        };
-
 
         // function to draw the geometries to the map
 
@@ -218,15 +216,17 @@
             dataLayer.eachLayer(function(layer){
                 
                 var props = layer.feature.properties;
+                var rate = (Number(layer.feature.properties[attribute]));
                 
                 layer.setStyle({
-                    fillColor : getColor(Number(layer.feature.properties[attribute]), breaks)
+                    fillColor : getColor(Number(rate), breaks)
                 });
+                
                 
                 layer.on('mouseover', function(){
                         layer.setStyle({
                         color: '#FFE969',
-                        weight: 2
+                        weight: 3
                         }).bringToFront();
                 });
                 layer.on('mouseout', function(){
@@ -237,12 +237,23 @@
                 });
                 
                 layer.bindPopup("<b>"+props["NAME"] + " County<br></b>" +
-                                attribute +
-                                ": " + (Number(layer.feature.properties[attribute])) + "%");
-                    
-                });
+                                attribute + ": " + rate + "%");
                 
-            }
+                layer.on('mouseover', function(){
+                        dataLayer.on('mouseover',function(){
+                        $(".info").show();
+                        });
+                    
+                        dataLayer.on('mouseout',function(){
+                        $(".info").hide();
+                        });
+                
+                updateInfo(props);
+                
+                })
+                
+            })
+        }
             
         
         
@@ -257,6 +268,7 @@
                     
                     var value = layer.feature.properties[String(i)];
                     values.push(Number(value));
+                    
                 }
                 
                 
@@ -298,13 +310,13 @@
             };
             
             legendControl.addTo(map);
-            var legend = $('.legend').html("<h3><span>2000</span>Kentucky Unemployment Rates</h3><ul>");
+            var legend = $('.legend').html("<h3><span>2000</span> Rates</h3><ul>");
             
             for(var i = 0; i < breaks.length -1; i++){
                 
                 var color = getColor(breaks[i + 1], breaks);
                 $('.legend ul').append('<li><span style ="background:' + color + '"></span> ' + 
-                    breaks[i] + '&mdash; ' +
+                    breaks[i] + ' &mdash; ' +
                     breaks[i +1] + '</li>');
             }
             
@@ -316,19 +328,21 @@
             
             var sliderControl = L.control( {position: 'bottomleft'} );
             
-            sliderControl.onAdd = function(map){
+                sliderControl.onAdd = function(map){
                 
-                var slider = L.DomUtil.get("ui-controls");
+                    var slider = L.DomUtil.get("ui-controls");
                 
-                    L.DomEvent.addListener(slider, 'mousedown',function(e){
+                        L.DomEvent.addListener(slider, 'mousedown',function(e){
                         
-                        L.DomEvent.stopPropagation(e);
+                            L.DomEvent.stopPropagation(e);
                         
-                    });
-                return slider;
-            }
+                        });
+                
+                    return slider;
+                
+                }
             
-            sliderControl.addTo(map);
+        sliderControl.addTo(map);
             
             $(".year-slider").on("input change", function(){
                 
@@ -338,10 +352,56 @@
             })
         }
         
-        functionBuildInfo(){
+        function drawInfo(){
             
+            var info = L.control( {position: 'bottomright'});
             
+            info.onAdd = function(map) {
+                
+                var div = L.DomUtil.create('div', 'info');
+                
+                return div;
+            }
+            
+            info.addTo(map);
+            $(".info").hide();
         }
+        
+        function updateInfo(props){
+            
+            //console.log(counties);
+            //var props = properties;
+            
+            //var props = features.properties
+            
+            //for(var i = 0; i< )    
+            
+        
+            
+            //var rate = layer.feature.
+            
+            var html =  "<h3>"+props["NAME"]+" County</h3>"+
+                        "2000: <b>"+ props["2000"] +"</b><br>"+
+                        "2001: <b>"+ props["2001"] +"</b><br>"+
+                        "2002: <b>"+ props["2002"] +"</b><br>"+
+                        "2003: <b>"+ props["2003"] +"</b><br>"+
+                        "2004: <b>"+ props["2004"] +"</b><br>"+
+                        "2005: <b>"+ props["2005"] +"</b><br>"+
+                        "2006: <b>"+ props["2006"] +"</b><br>"+
+                        "2007: <b>"+ props["2007"] +"</b><br>"+
+                        "2008: <b>"+ props["2008"] +"</b><br>"+
+                        "2009: <b>"+ props["2009"] +"</b><br>"+
+                        "2010: <b>"+ props["2010"] +"</b><br>"+
+                        "2011: <b>"+ props["2011"] +"</b><br>"+
+                        "2012: <b>"+ props["2012"] +"</b><br>"+
+                        "2013: <b>"+ props["2013"] +"</b><br>"
+                        
+            $(".info").html(html);
+            
+            };
+            
+            
+        
         
         
         
