@@ -3,7 +3,7 @@
 
 <head>
     <meta charset=utf-8 />
-    <title>Lesson 03 Starter Template</title>
+    <title>Kentucky Unemployment Rates</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
@@ -87,6 +87,20 @@
             font-size: 1.1em;
             font-weight: bold;
         }
+        .leaflet-popup-content {
+            max-width: 160px;   
+        }
+        .info{
+            padding: 6px 8px;
+            font-size: 1em;
+            background:rgba(255,255,255,.8);
+            box-shadow: 0 0 015px rgba(0,0,0,.2);
+            border-radius: 5px;
+            text-align: right;
+        }
+        .info h3{
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -125,8 +139,7 @@
         
         map.addLayer(tiles);
         
-        var dataLayer;
-    
+     
         // declare global variables
         
         $.getJSON("ky-counties.json", function(counties){
@@ -167,7 +180,7 @@
             dataLayer = L.geoJson(counties, {
                 style: function(feature){
                     return {
-                        color: 'blue',
+                        color: 'black',
                         weight: 1,
                         fillOpacity: .9,
                         fillColor: 'blue'
@@ -184,6 +197,16 @@
             createSliderUI(breaks);
             
         }
+        
+        var labels = { 
+            "VACANT": "% total vacant units",
+            "VACANT_FOR": "% vacant housing units for rent",
+            "VACANT_FO2": "% vacant housing units for sale",
+            "VACANT_SEA": "% vacant seasonal housing units",
+            "VACANT_REN": "% vacant units rented not occupied",
+            "VACANT_SOL": "% vacant units sole not occupied",
+            "VACANT_MIG": "% vacant units used for migratory workers",
+        };
 
 
         // function to draw the geometries to the map
@@ -194,26 +217,33 @@
             
             dataLayer.eachLayer(function(layer){
                 
+                var props = layer.feature.properties;
+                
                 layer.setStyle({
                     fillColor : getColor(Number(layer.feature.properties[attribute]), breaks)
                 });
                 
                 layer.on('mouseover', function(){
                         layer.setStyle({
-                        color: '#FFFF00',
+                        color: '#FFE969',
                         weight: 2
                         }).bringToFront();
                 });
                 layer.on('mouseout', function(){
                         layer.setStyle({
-                        color: 'blue',
+                        color: 'black',
                         weight: 1    
                         })
-                })
+                });
                 
-            })
+                layer.bindPopup("<b>"+props["NAME"] + " County<br></b>" +
+                                attribute +
+                                ": " + (Number(layer.feature.properties[attribute])) + "%");
+                    
+                });
+                
+            }
             
-        }
         
         
         // function gets the class breaks
@@ -242,15 +272,15 @@
         function getColor(d, breaks){
             
             if(d <= breaks[1]){
-                return '#f2f0f7';
+                return '#FFFFFF';
             }else if (d <= breaks[2]) {
-                return '#cbc9e2';
+                return '#B4C4FD';
             }else if (d <= breaks[3]) {
-                return '#9e9ac8';
+                return '#7B97FF';
             }else if (d <= breaks[4]) {
-                return '#756bb1';
+                return '#4970FF';
             }else if (d <= breaks[5]) {
-                return '#54278f'
+                return '#0D41FF'
             }
         
         }
@@ -284,7 +314,7 @@
         // function to create the UI
         function createSliderUI(breaks){
             
-            var sliderControl = L.control({ position: 'bottomleft'});
+            var sliderControl = L.control( {position: 'bottomleft'} );
             
             sliderControl.onAdd = function(map){
                 
@@ -307,6 +337,13 @@
                 $(".legend h3 span").html(attribute);
             })
         }
+        
+        functionBuildInfo(){
+            
+            
+        }
+        
+        
         
         
         
