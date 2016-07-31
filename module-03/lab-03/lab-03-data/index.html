@@ -26,8 +26,16 @@
             padding: 6px 10%;
         }
         h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
             padding: 8px 15px;
-            margin: 0; 
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(25,25,25,0.8);
+            border-radius: 5px; 
         }
         #map {
             position: absolute;
@@ -105,6 +113,7 @@
             margin: 0;
             text-align: center
         }
+
     </style>
 </head>
 
@@ -154,7 +163,6 @@
                 complete: function(data){
                     
                     processData(counties, data);
-                    updateInfo(counties);
                 }
             })
         });
@@ -189,7 +197,7 @@
                     return {
                         color: 'black',
                         weight: 1,
-                        fillOpacity: .9,
+                        fillOpacity: 1,
                         fillColor: 'blue'
                     };
                     
@@ -199,13 +207,13 @@
                         
             var breaks = getClassBreaks();
             
-            
+        
             updateMap(breaks, '2000');
             drawLegend(breaks);
             createSliderUI(breaks);
             drawInfo();
-            
         }
+        
 
         // function to draw the geometries to the map
 
@@ -249,13 +257,13 @@
                         });
                 
                 updateInfo(props);
-                
+                        
                 })
                 
             })
         }
             
-        
+
         
         // function gets the class breaks
         function getClassBreaks(){
@@ -270,7 +278,6 @@
                     values.push(Number(value));
                     
                 }
-                
                 
             });
             
@@ -314,7 +321,7 @@
             
             for(var i = 0; i < breaks.length -1; i++){
                 
-                var color = getColor(breaks[i + 1], breaks);
+            var color = getColor(breaks[i + 1], breaks);
                 $('.legend ul').append('<li><span style ="background:' + color + '"></span> ' + 
                     breaks[i] + ' &mdash; ' +
                     breaks[i +1] + '</li>');
@@ -322,6 +329,23 @@
             
             legend.append("</ul>")
         }
+        
+//        function updateLegend(rate, breaks){
+//            
+//            var legend = $('.legend').html("<h3>" + rate + "</h3><ul>");
+//                //var legend = $('.legend')
+//                //legend.html("<h3>" + labels[attribute] + " per " + norm + "</h3>"); 
+//                
+//                for (var i = 0; i < breaks.length; i++) {
+//            
+//                var color = getColor(rate[i][0], breaks);
+//                    
+//                legend.append(
+//                        '<span style="background:' + color + '"></span> ' +
+//                        '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
+//                        (breaks[i][1]*100).toLocaleString() + '</label>');
+//                }
+//        }
 
         // function to create the UI
         function createSliderUI(breaks){
@@ -369,45 +393,27 @@
         
         function updateInfo(props){
             
-            //console.log(counties);
-            //var props = properties;
-            
-            //var props = features.properties
-            
-            //for(var i = 0; i< )    
-            
-        
-            
-            //var rate = layer.feature.
-            
             var html =  "<h3>"+props["NAME"]+" County</h3>"+
-                        "2000: <b>"+ props["2000"] +"</b><br>"+
-                        "2001: <b>"+ props["2001"] +"</b><br>"+
-                        "2002: <b>"+ props["2002"] +"</b><br>"+
-                        "2003: <b>"+ props["2003"] +"</b><br>"+
-                        "2004: <b>"+ props["2004"] +"</b><br>"+
-                        "2005: <b>"+ props["2005"] +"</b><br>"+
-                        "2006: <b>"+ props["2006"] +"</b><br>"+
-                        "2007: <b>"+ props["2007"] +"</b><br>"+
-                        "2008: <b>"+ props["2008"] +"</b><br>"+
-                        "2009: <b>"+ props["2009"] +"</b><br>"+
-                        "2010: <b>"+ props["2010"] +"</b><br>"+
-                        "2011: <b>"+ props["2011"] +"</b><br>"+
-                        "2012: <b>"+ props["2012"] +"</b><br>"+
-                        "2013: <b>"+ props["2013"] +"</b><br>"
+                        "2000: <b>"+ props["2000"] +"%</b><br>"+
+                        "2001: <b>"+ props["2001"] +"%</b><br>"+
+                        "2002: <b>"+ props["2002"] +"%</b><br>"+
+                        "2003: <b>"+ props["2003"] +"%</b><br>"+
+                        "2004: <b>"+ props["2004"] +"%</b><br>"+
+                        "2005: <b>"+ props["2005"] +"%</b><br>"+
+                        "2006: <b>"+ props["2006"] +"%</b><br>"+
+                        "2007: <b>"+ props["2007"] +"%</b><br>"+
+                        "2008: <b>"+ props["2008"] +"%</b><br>"+
+                        "2009: <b>"+ props["2009"] +"%</b><br>"+
+                        "2010: <b>"+ props["2010"] +"%</b><br>"+
+                        "2011: <b>"+ props["2011"] +"%</b><br>"+
+                        "2012: <b>"+ props["2012"] +"%</b><br>"+
+                        "2013: <b>"+ props["2013"] +"%</b><br>"
                         
             $(".info").html(html);
             
-            };
-            
-            
-        
-        
-        
-        
-        
-        
+        };
 
+            
     </script>
     
 </body>
