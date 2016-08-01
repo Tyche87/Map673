@@ -153,7 +153,7 @@
         map.addLayer(tiles);
         
      
-        // declare global variables
+        // declare global variables, loading both GeoJson and CSV data file into the script
         
         $.getJSON("ky-counties.json", function(counties){
             
@@ -162,9 +162,11 @@
                 header: true, 
                 complete: function(data){
                     
-                    processData(counties, data);
+                processData(counties, data);
+                    
                 }
             })
+            
         });
         
         
@@ -176,7 +178,9 @@
                 
                 
                 for(var d in data.data){
+                    
                     var countyFIP = counties.features[county].properties.COUNTY_FIP,
+                        
                         dataFIP = data.data[d].CNTY;
                     
                     if(countyFIP === dataFIP) {
@@ -184,13 +188,13 @@
                         counties.features[county].properties = data.data[d];
                     }
                     
-                    //console.log(data.data[d])
                 }
+                
             }
             
             drawMap(counties);
         }
-
+        // function to draw the geometries to the map
         function drawMap(counties){
             dataLayer = L.geoJson(counties, {
                 style: function(feature){
@@ -207,24 +211,21 @@
                         
             var breaks = getClassBreaks();
             
-        
+        // functions called to update the map with all visual information and UI
             updateMap(breaks, '2000');
             drawLegend(breaks);
             createSliderUI(breaks);
             drawInfo();
         }
-        
 
-        // function to draw the geometries to the map
-
-        // function to update the map (once for the initial data view and then again to update the map per the user's request)
+        // function to update the map (once for the initial data view and then again to update the map per the user's request). Also Including mouseover event to highlight layer, and create popup displaying county name, year and corresponding unemployment rate
         
         function updateMap(breaks, attribute) {
             
             dataLayer.eachLayer(function(layer){
                 
                 var props = layer.feature.properties;
-                var rate = (Number(layer.feature.properties[attribute]));
+                var rate = (Number(props[attribute]));
                 
                 layer.setStyle({
                     fillColor : getColor(Number(rate), breaks)
@@ -287,7 +288,7 @@
 
         } 
         
-        // function to get the color value
+        // function to get the color value using 
         function getColor(d, breaks){
             
             if(d <= breaks[1]){
@@ -304,7 +305,7 @@
         
         }
 
-        // function to draw the legend
+        // function to draw the legend using global variable 'breaks' from getClassBreaks above  
         function drawLegend(breaks){
             
             var legendControl = L.control({position: 'topright'});
@@ -329,25 +330,8 @@
             
             legend.append("</ul>")
         }
-        
-//        function updateLegend(rate, breaks){
-//            
-//            var legend = $('.legend').html("<h3>" + rate + "</h3><ul>");
-//                //var legend = $('.legend')
-//                //legend.html("<h3>" + labels[attribute] + " per " + norm + "</h3>"); 
-//                
-//                for (var i = 0; i < breaks.length; i++) {
-//            
-//                var color = getColor(rate[i][0], breaks);
-//                    
-//                legend.append(
-//                        '<span style="background:' + color + '"></span> ' +
-//                        '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
-//                        (breaks[i][1]*100).toLocaleString() + '</label>');
-//                }
-//        }
 
-        // function to create the UI
+        // function to create the UI silder where the user's year slider data is sent to the updateMap function via 'attribute' to select and dislplay the correct data per year   
         function createSliderUI(breaks){
             
             var sliderControl = L.control( {position: 'bottomleft'} );
@@ -369,13 +353,14 @@
         sliderControl.addTo(map);
             
             $(".year-slider").on("input change", function(){
-                
+                //user input assigned to 'attribute'
                 var attribute = $(this).val();
                 updateMap(breaks, attribute);
                 $(".legend h3 span").html(attribute);
             })
         }
-        
+    
+        // create info box, with content manipulated by the updateInfo function and fired in the drawMap function with mouseover UI event. 
         function drawInfo(){
             
             var info = L.control( {position: 'bottomright'});
@@ -391,6 +376,7 @@
             $(".info").hide();
         }
         
+        // possibly an inefficient method to re-populate the info box from the counties layer brought in from the drawMap function     
         function updateInfo(props){
             
             var html =  "<h3>"+props["NAME"]+" County</h3>"+
