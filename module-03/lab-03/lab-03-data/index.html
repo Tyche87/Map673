@@ -205,9 +205,31 @@
                         fillColor: 'blue'
                     };
                     
-                }
+                },
+				onEachFeature : function(feature, layer) {
+					
+					 layer.on('mouseover', function(){
+                        layer.setStyle({
+                        	color: '#FFE969',
+                        	weight: 3
+                        }).bringToFront();
+                	});
+                	layer.on('mouseout', function(){
+                        layer.setStyle({
+                        	color: 'black',
+                        	weight: 1    
+                        })
+                	});
+					
+				}
             
             }).addTo(map);
+			
+			                   
+			dataLayer.on('mouseout',function(){
+			   $(".info").hide();
+			});
+                
                         
             var breaks = getClassBreaks();
             
@@ -225,43 +247,25 @@
             dataLayer.eachLayer(function(layer){
                 
                 var props = layer.feature.properties;
-                var rate = (Number(props[attribute]));
+                var rate = Number(props[attribute]);
                 
                 layer.setStyle({
-                    fillColor : getColor(Number(rate), breaks)
-                });
-                
-                
-                layer.on('mouseover', function(){
-                        layer.setStyle({
-                        color: '#FFE969',
-                        weight: 3
-                        }).bringToFront();
-                });
-                layer.on('mouseout', function(){
-                        layer.setStyle({
-                        color: 'black',
-                        weight: 1    
-                        })
+                    fillColor : getColor(rate, breaks)
                 });
                 
                 layer.bindPopup("<b>"+props["NAME"] + " County<br></b>" +
                                 attribute + ": " + rate + "%");
+                         
+                layer.on('mouseover',function(){
+                   $(".info").show();
+				   updateInfo(props);
+                });
+ 
                 
-                layer.on('mouseover', function(){
-                        dataLayer.on('mouseover',function(){
-                        $(".info").show();
-                        });
-                    
-                        dataLayer.on('mouseout',function(){
-                        $(".info").hide();
-                        });
-                
-                updateInfo(props);
                         
-                })
+			});
                 
-            })
+           
         }
             
 
