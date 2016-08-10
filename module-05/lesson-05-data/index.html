@@ -39,7 +39,37 @@
             maxBounds: L.latLngBounds([-6.22, 27.72],[5.76, 47.83])
         });
         
-        var countyCentroids = omnivore.csv('kenya_education_2014.csv').addTo(map);
+        var countyCentroids = omnivore.csv('kenya_education_2014.csv')
+            .on('ready',function(e) {
+               drawMap(e.target.toGeoJSON())
+            })
+            .on('error', function(e) {
+                console.log(e.error[0].message)
+            });
+        
+        function drawMap(schoolData){
+            var girls = L.geoJson(schoolData, {
+                pointToLayer: function(feature, layer){
+                    return L.circleMarker(layer, {
+                        radius: calcRadius(Number(feature.properties.G1))       
+                    });
+                }
+            }).addTo(map);
+            
+            var boys = L.geoJson(schoolData, {
+                pointToLayer: function(feature, layer){
+                    return L.circleMarker(layer, {
+                        radius: calcRadius(Number(feature.properties.B1))
+                    });
+                }
+            }).addTo(map);
+            
+        }
+        
+        function calcRadius(val) {
+            var radius = Math.sqrt(val/Math.PI);
+            return radius * .6;
+        }
 
     </script>
 </body>
