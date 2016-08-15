@@ -7,7 +7,7 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
     <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
-<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.1/simple_statistics.js"></script>
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
@@ -113,11 +113,11 @@
         <label> Choose a data attribute:</label>
         <select id = "vacant"> 
             <option value="VACANT_FOR" selected>vacant units for rent</option>
-            <option value="VACANT_REN" >vacant units rented not occupied</option>
-            <option value="VACANT_FO2" >vacant units for sale</option>
-            <option value="VACANT_SOL" >vacant units sole not occupied</option>
-            <option value="VACANT_SEA" >vacant units used seasonally</option>
-            <option value="VACANT_MIG" >vacant units used for migratory workers</option>
+            <option value="VACANT_REN">vacant units rented not occupied</option>
+            <option value="VACANT_FO2">vacant units for sale</option>
+            <option value="VACANT_SOL">vacant units sole not occupied</option>
+            <option value="VACANT_SEA">vacant units used seasonally</option>
+            <option value="VACANT_MIG">vacant units used for migratory workers</option>
         </select>
     </div>
     <div id='map'></div>
@@ -125,7 +125,6 @@
     <footer>
         <p>Map authored by Tyler Hegwood</p>
         <p>Housing Data Sourced from the 2010 US Census</p>
-        <p></p>
     </footer>
 
     <script>
@@ -144,26 +143,26 @@
             attribute = "VACANT_FOR",
             norm = "VACANT";
     
-    //JQuery method to import GeoJSON data file useable in this lab      
+    	//JQuery method to import GeoJSON data file useable in this lab      
         $.getJSON("ky_counties_housing.json", function(data) {
         
-    //Instantiate geoJson map with basic style options          
-            dataLayer = L.geoJson(data, {
-                 style: function(feature) {
-                    return {
-                            color: '#dddddd',
-                            weight: 2,
-                            fillOpacity: 1,
-                            fillColor: '#1f78b4'
-                    };
-                }        
-            }).addTo(map);
+    	//Instantiate geoJson map with basic style options          
+		dataLayer = L.geoJson(data, {
+			 style: function(feature) {
+				return {
+						color: '#dddddd',
+						weight: 2,
+						fillOpacity: 1,
+						fillColor: '#1f78b4'
+				};
+			}        
+		}).addTo(map);
             
-    //'Function Junction' where the main operating functions are called to build the project         
-            drawLegend();
-            drawMap();
-            drawInfo();
-            buildUI();  
+    	//'Function Junction' where the main operating functions are called to build the project         
+		drawLegend();
+		drawMap();
+		drawInfo();
+		buildUI();  
               
         });
         
@@ -177,10 +176,10 @@
             "VACANT_MIG": "% vacant units used for migratory workers",
         }; 
         
-    //content of drawMap function where layers are colored by getClassBreaks function from below, as well as
-    //layer mouseover/out highlight method, popup is bound, functionality to show or hide info box based on 
-    // whether user is moused over map layer, and functions called to update info box and legend breaks based on user
-    //data selection     
+		//content of drawMap function where layers are colored by getClassBreaks function from below, as well as
+		//layer mouseover/out highlight method, popup is bound, functionality to show or hide info box based on 
+		// whether user is moused over map layer, and functions called to update info box and legend breaks based on user
+		//data selection     
         function drawMap() {
             
             var breaks = getClassBreaks();
@@ -213,18 +212,18 @@
                                 labels[attribute] + ": " +
                                 ((props[attribute]/props[norm])*100).toLocaleString()+"%");
                 
-                layer.on('mouseover', function(){
-                    dataLayer.on('mouseover',function(){
-                        $(".info").show();
-                    });
+              
+                layer.on('mouseover',function(){
+					updateInfo(this);
+                    $(".info").show();
+				});
                     
-                    dataLayer.on('mouseout',function(){
-                        $(".info").hide();
-                    });
+				layer.on('mouseout',function(){
+					$(".info").hide();
+				});
                 
-                    updateInfo(this);
                     
-                });
+
             
         });
                 
@@ -233,7 +232,7 @@
         };
         
         
-    //function to calculate and retutn class breaks to the drawMap function using the ckmeans clustering method from the simple statistics js library          
+    	//function to calculate and retutn class breaks to the drawMap function using the ckmeans clustering method from the simple statistics js library          
         function getClassBreaks() {
             
             var values = [];
@@ -253,8 +252,8 @@
             
         }   
         
-    //getColor function content that uses the breaks establashed above to deliniate color codes for each layer based on the 
-    //clusters generated with the ck means method
+		//getColor function content that uses the breaks establashed above to deliniate color codes for each layer based on the 
+		//clusters generated with the ck means method
         function getColor(d, breaks) {
             
             if(d <= breaks[0][1]) {
@@ -270,7 +269,7 @@
             }
         }
         
-    //establish legend and call legend style from .legend css class     
+    	//establish legend and call legend style from .legend css class     
         function drawLegend() {
             
             var legend = L.control({position: 'topleft'});
@@ -286,7 +285,7 @@
             legend.addTo(map);
         }
         
-    //UI data selector build using jQuery select and change event    
+    	//UI data selector build using jQuery select and change event    
         function buildUI(){
             $('select[id="vacant"]').change(function(){
                 attribute = $(this).val();
@@ -294,25 +293,23 @@
             })
         }
             
-    //using jQuery to effect changes to .legend class styles from user data selection    
+    	//using jQuery to effect changes to .legend class styles from user data selection    
         function updateLegend(breaks){
             
                 var legend = $('.legend').html("<h3>" + labels[attribute] + "</h3><ul>");
-                //var legend = $('.legend')
-                //legend.html("<h3>" + labels[attribute] + " per " + norm + "</h3>"); 
                 
                 for (var i = 0; i < breaks.length; i++) {
             
-                var color = getColor(breaks[i][0], breaks);
+                	var color = getColor(breaks[i][0], breaks);
                     
-                legend.append(
+                	legend.append(
                         '<span style="background:' + color + '"></span> ' +
                         '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
                         (breaks[i][1]*100).toLocaleString() + '</label>');
                 }
         }
         
-    //info box generated using leaflet control method     
+    	//info box generated using leaflet control method     
         function drawInfo(){
             var info = L.control( {position: 'topright'});
             
@@ -327,7 +324,7 @@
             $(".info").hide();
         }
         
-    //content related to the info box      
+    	//content related to the info box      
         function updateInfo(layer){
             var props = layer.feature.properties;
             
@@ -342,13 +339,8 @@
                         
             $(".info").html(html);
             
-            };
+		};
             
-        
-            
-        
-
-
     </script>
     
 </body>
