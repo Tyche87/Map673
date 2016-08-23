@@ -6,12 +6,14 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+
     
     <style>
       html, body, #map {
         height: 100%;
         padding: 0;
         margin: 0;
+        
       }
     </style>
 </head>
@@ -20,7 +22,78 @@
     <div id="map"></div>
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    
+    <script type="cartCSS/html" id="counties-styles">
+    
+    /** choropleth visualization */
+
+#uninsuredadults_bycounty{
+  polygon-fill: #FFCC00;
+  polygon-opacity: 0.8;
+  line-color: #FFFFFF;
+  line-width: 0.5;
+  line-opacity: 1;
+}
+#uninsuredadults_bycounty [ uninsured <= 42] {
+   polygon-fill: #B10026;
+}
+#uninsuredadults_bycounty [ uninsured <= 36] {
+   polygon-fill: #E31A1C;
+}
+#uninsuredadults_bycounty [ uninsured <= 29] {
+   polygon-fill: #FC4E2A;
+}
+#uninsuredadults_bycounty [ uninsured <= 24] {
+   polygon-fill: #FD8D3C;
+}
+#uninsuredadults_bycounty [ uninsured <= 18] {
+   polygon-fill: #FEB24C;
+}
+#uninsuredadults_bycounty [ uninsured <= 13] {
+   polygon-fill: #FED976;
+}
+#uninsuredadults_bycounty [ uninsured <= 8] {
+   polygon-fill: #FFFFB2;
+}</script>
+    
     <script>
+        
+        //var url = 'https://tyche87.carto.com/api/v2/viz/b71fb406-e669-11e5-98a4-0e674067d321/viz.json'
+        
+
+        var map = L.map('map', {
+            center: [-7.5,5],
+            zoom: 4.5,
+        });
+        
+//        var cartoCSS = '#uninsuredadults_bycounty{' +
+//          'polygon-fill: #FFCC00;' +
+//          'polygon-opacity: 0.8;' +
+//          'line-color: #FFFFFF;' +
+//          'line-width: 0.5;' +
+//          'line-opacity: 1;' +
+//        '}';
+        
+        var sourceObject = {
+            user_name: 'tyche87',
+            type: 'cartodb',
+            sublayers: [
+                {
+                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,uninsured FROM uninsuredadults_bycounty",
+                    cartocss: $("#counties-styles").text()
+                },
+//                {
+//                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,uninsured FROM uninsuredadults_bycounty",
+//                    cartocss: $("#counties-styles").text()
+//                },
+//                {
+//                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,uninsured FROM uninsuredadults_bycounty",
+//                    cartocss: $("#counties-styles").text()
+//                }
+            ]
+        };
+        
+        cartodb.createLayer(map, sourceObject).addTo(map)
 
     </script>
 </body>
