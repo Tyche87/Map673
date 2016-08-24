@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>673 Module 06 CartoDB Starter Template</title>
+    <title>Change in Durable Goods Spending Per Capita by State 2013-2014</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 
     <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
 
     
     <style>
@@ -13,87 +14,163 @@
         height: 100%;
         padding: 0;
         margin: 0;
-        
       }
+        
+        #title-bar {
+            position: absolute;
+            top: 0;
+            right: .5%;
+            left: .5%;
+            width: 99%;
+            height: 10%;
+            background-color: rgba(90, 90, 90, 0.30);
+        }
+        #side-panel {
+            position: absolute;
+            right: .5%;
+            top: 11%;
+            bottom: 45%;
+            width: 20%;
+            background-color: #d1d1d1;
+            background-color: rgba(90, 90, 90, 0.30);
+        }
+        
+        h1 {
+            font-family: 'Comfortaa', cursive;
+            color: whitesmoke;
+            text-align: center;
+            font-weight: 400;
+            font-size: 1.5em;    
+        }
+        h2 {
+            font-family: 'Comfortaa', cursive;
+            color: whitesmoke;
+            text-align: center;
+            font-weight: 200;
+            font-size: 1em;    
+        }
+        h3{
+            font-family: 'Comfortaa', cursive;
+            color: whitesmoke;
+            text-align: center;
+            font-weight: 100;
+            font-size: .4em;
+        }
+        p {
+            font-family: 'Comfortaa', cursive;
+            color: whitesmoke;
+            padding: 5%;
+            text-align: left;
+            font-weight: 200;
+            font-size: .8em;
+        }
+        
     </style>
 </head>
 <body>
     
+    
     <div id="map"></div>
+    
+    <div id='title-bar'>
+    <h1>Change in Durable Goods Spending Per Capita by State 2013-2014</h1>
+    </div>
+    
+    <div id='side-panel'>
+        <h2>About this map: </h2>
+        <p>A visual representation of the change in per capita spending on durable good, as bounded by states over the years 2013 to 2014.</p>
+        <h2>Data:</h2>
+        <p>The data for this map was sourced from the Bureau of Economic Analysis - www.bea.gov</p>
+        <h3>Map authored by: Tyler Hegwood 2016</h3>
+    </div>
+
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
     
-    <script type="cartCSS/html" id="counties-styles">
+    <script type="cartCSS/html" id="states-styles">
     
     /** choropleth visualization */
 
-#uninsuredadults_bycounty{
-  polygon-fill: #FFCC00;
-  polygon-opacity: 0.8;
-  line-color: #FFFFFF;
-  line-width: 0.5;
-  line-opacity: 1;
-}
-#uninsuredadults_bycounty [ uninsured <= 42] {
-   polygon-fill: #B10026;
-}
-#uninsuredadults_bycounty [ uninsured <= 36] {
-   polygon-fill: #E31A1C;
-}
-#uninsuredadults_bycounty [ uninsured <= 29] {
-   polygon-fill: #FC4E2A;
-}
-#uninsuredadults_bycounty [ uninsured <= 24] {
-   polygon-fill: #FD8D3C;
-}
-#uninsuredadults_bycounty [ uninsured <= 18] {
-   polygon-fill: #FEB24C;
-}
-#uninsuredadults_bycounty [ uninsured <= 13] {
-   polygon-fill: #FED976;
-}
-#uninsuredadults_bycounty [ uninsured <= 8] {
-   polygon-fill: #FFFFB2;
-}</script>
+        #durable_goods_join_shp{
+            polygon-fill: #FFFFB2;
+            polygon-opacity: 0.9;
+            line-color: #FFF;
+            line-width: 0.5;
+            line-opacity: 1;
+        }
+        #durable_goods_join_shp [ delta <= 4] {
+            polygon-fill: #B10026;
+        }
+        #durable_goods_join_shp [ delta <= 3.3] {
+            polygon-fill: #E31A1C;
+        }
+        #durable_goods_join_shp [ delta <= 2] {
+            polygon-fill: #FC4E2A;
+        }
+        #durable_goods_join_shp [ delta <= 1.3] {
+            polygon-fill: #FD8D3C;
+        }
+        #durable_goods_join_shp [ delta <= 0.9] {
+            polygon-fill: #FEB24C;
+        }
+        #durable_goods_join_shp [ delta <= 0.5] {
+            polygon-fill: #FED976;
+        }
+        #durable_goods_join_shp [ delta <= -0.1] {
+            polygon-fill: #FFFFB2;
+        }
+    </script>
     
     <script>
         
-        //var url = 'https://tyche87.carto.com/api/v2/viz/b71fb406-e669-11e5-98a4-0e674067d321/viz.json'
+        var url = 'https://tyche87.carto.com/api/v2/viz/b71fb406-e669-11e5-98a4-0e674067d321/viz.json'
         
 
         var map = L.map('map', {
             center: [-7.5,5],
             zoom: 4.5,
+            minZoom: 4,
+            title: true,
         });
+ 
+                
+        var graticuleCartoCSS = '#na_grat_clipped{' +
+            'line-color: #777574;' +
+            'line-width: 2;' +
+            'line-opacity: 0.7;' +
+        '}';
         
-//        var cartoCSS = '#uninsuredadults_bycounty{' +
-//          'polygon-fill: #FFCC00;' +
-//          'polygon-opacity: 0.8;' +
-//          'line-color: #FFFFFF;' +
-//          'line-width: 0.5;' +
-//          'line-opacity: 1;' +
-//        '}';
+        var landCartoCSS = '#na_land_clipped{' +
+            'polygon-fill: #777574;' +
+            'polygon-opacity: 1;' +
+            'line-color: #FFF;' +
+            'line-width: 0.2;' +
+            'line-opacity: 1;' +
+        '}';
+        
         
         var sourceObject = {
             user_name: 'tyche87',
             type: 'cartodb',
             sublayers: [
                 {
-                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,uninsured FROM uninsuredadults_bycounty",
-                    cartocss: $("#counties-styles").text()
+                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator FROM na_grat_clipped",
+                    cartocss: graticuleCartoCSS
                 },
-//                {
-//                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,uninsured FROM uninsuredadults_bycounty",
-//                    cartocss: $("#counties-styles").text()
-//                },
-//                {
-//                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,uninsured FROM uninsuredadults_bycounty",
-//                    cartocss: $("#counties-styles").text()
-//                }
+                {
+                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator FROM na_land_clipped",
+                    cartocss: landCartoCSS
+                },
+                {
+                    sql: "SELECT ST_transform(the_geom, 2163) AS the_geom_webmercator,cartodb_id,delta FROM durable_goods_join_shp",
+                    cartocss: $("#states-styles").text()
+                },
+                
             ]
         };
         
         cartodb.createLayer(map, sourceObject).addTo(map)
+    
 
     </script>
 </body>
