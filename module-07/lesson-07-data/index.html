@@ -117,10 +117,6 @@
         svg.append("g")
             .selectAll("path")
             .data(topojson.feature(counties, counties.objects.counties).features)
-            .sort(function(a,b){
-                return b.properties.total_emissions - 
-                a.properties.total_emissisons;
-        })
             .enter()
             .append("path")
             .attr("d", geoPath)
@@ -137,6 +133,10 @@
         var facilities = svg.append("g")
             .selectAll("circle")
             .data(emitters)
+            .sort(function(a,b){
+                return b.properties.total_emissions - 
+                a.properties.total_emissisons;
+            })
             .enter()
             .append("circle")
             .attr("cx",function(d){
