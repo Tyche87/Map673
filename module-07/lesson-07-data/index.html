@@ -30,7 +30,6 @@
             border: 1px solid #d3d3d3;
         }
         .county{
-            fill: steelblue;
             stroke: white;
         }
         
@@ -44,11 +43,7 @@
             fill: yellow;
             stroke: grey;
         } 
-        .slider {
-            width: 300px;
-            margin-left: 223px;
-            
-        }
+
         #emission-value {
             margin-left: 223px;
         }
@@ -60,13 +55,10 @@
     <div id="map"></div>
     <h1>US Counties</h1>
     <h2></h2>
-    
-    <input type="range" class="slider">
-    <div id="emission-value"></div>
-    
+        
 <script src ="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src ="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.20/topojson.min.js"></script>    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/0.9.0/simple_statistics.min.js"></script>    
 <script>
 
     var width = 900, height = 600;
@@ -76,7 +68,7 @@
                 .attr("width", width)
                 .attr("height", height);
     
-    var projection = d3.geo.albersUsa()
+    var projection = d3.geo.albers()
             .scale(1000)
             .translate([width/2, height/2]);
     
@@ -84,27 +76,28 @@
             .projection(projection);
     
     queue()
-        .defer(d3.json, 'us-counties-topo.json')
+        .defer(d3.json, "https://tyche87.carto.com/api/v2/sql?format=geoJSON&q=SELECT * FROM uninsuredadults_bycounty")
         .defer(d3.json, 'na_land_clipped.json')
-        .defer(d3.csv, 'direct-emitters.csv')
         .await(makeMap);
     
-        function makeMap(error, counties, na, emitters){
+        function makeMap(error, counties, na){
             
-            var data = [];
+        var breaks = ss.jenks(counties.features.map(function(d){
+            return d.properties.uninsured;
+        }), 5);
             
-            emitters.forEach(function(emitter) {
-                data.push(Number(emitter.total_emissions))
-            });
             
-            var min = Math.min.apply(Math, data),
-                max = Math.max.apply(Math, data);
-        
-            var radius = d3.scale.sqrt()
-                .domain([min, max])
-                .range([3, 20])
-
-        console.log(counties)    
+        breaks.shift();
+        breaks.pop();
+            
+            console.log(breaks);
+            
+        var colors = ["#feedde", "#fdbe85", "#fd8d3c", "#e6550d", "#a63603"];
+            
+        var jenks = d3.scale.threshold()
+            .domain(breaks)
+            .range(colors);
+                
 
         svg.append("g")
             .selectAll("path")
@@ -116,68 +109,23 @@
 
         svg.append("g")
             .selectAll("path")
-            .data(topojson.feature(counties, counties.objects.counties).features)
+            .data(counties.features)
             .enter()
             .append("path")
             .attr("d", geoPath)
             .attr("class", "county")
+            .attr("fill", function(d) {
+                return jenks(d.properties.uninsured);
+            })
             .on("mouseover", function(d){
-                d3.select("h2").text(d.properties.NAME + ' County')
+                d3.select("h2").text(d.properties.name + ' County')
                 d3.select(this).attr('class', 'county hover')
             })
             .on("mouseout", function(d){
                 d3.select("h2").text('');
                 d3.select(this).attr('class', 'county');
             });
-            
-        var facilities = svg.append("g")
-            .selectAll("circle")
-            .data(emitters)
-            .sort(function(a,b){
-                return b.properties.total_emissions - 
-                a.properties.total_emissisons;
-            })
-            .enter()
-            .append("circle")
-            .attr("cx",function(d){
-                d.position = projection([d.lon, d.lat]);
-                if(d.position){
-                    return d.position[0];    
-                }else{
-                    console.log(d.position)
-                }
-            })
-            .attr("cy", function(d){
-                if(d.position){
-                return d.position[1];
-                }
-            })
-            .attr("r", function(d){
-                return radius(d.total_emissions);
-            })
-            .attr("class", "emitter");
-            
-        var output = d3.select("#emission-value").text(max.toLocaleString());
-            
-        d3.select(".slider")
-            .attr("min", min)
-            .attr("max", max)
-            .attr("value", max)
-            .attr("step",(min-max)/300)
-            .on('input', function(){
-                update(this.value);
-        });
-            
-        function update(val){
-            output.text(Number(val).toLocaleString());
-            
-            facilities.attr("display", function(d){
-                if(val <= Number(d.total_emissions)){
-                    return "none";
-                }
-            })
-        }
-            
+                        
     }
  
 </script>
