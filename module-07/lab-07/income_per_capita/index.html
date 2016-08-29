@@ -1,0 +1,210 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>US Per Capita Income 2014</title>
+
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            padding: 60;
+            margin: 0;
+            background: whitesmoke;
+            font-family: Montserrat, sans-serif;
+        }
+        h1 {
+            position: absolute;
+            left: 190px;
+            top: 10px;
+            font-size: 2em;
+            font-weight: 100;
+            color: #979797;
+        }
+        h2 {
+            position: absolute;
+            left: 190px;
+            font-size: 1.5em;
+            font-weight: 100;
+            color: #979797;
+            top: 45px;
+            font-size; 1.2em;
+        }
+        h3{
+            position: absolute;
+            left: 190px;
+            font-weight: 100;
+            color: #979797;
+            top: 75px;
+            font-size: 1em;
+            
+        }
+        #map {
+            width: 900px;
+            height: 600px;
+            margin: 50px auto 10px;
+            border: 1px solid #d3d3d3;
+            opacity: .7;
+        }
+        .county{
+            fill: grey;
+            stroke: white;
+        }
+        .land{
+            fill: #d3d3d3
+        }
+        .metro{
+            fill: rgba(253, 115, 0, 0.60);
+            stroke: #979797;
+            stroke-width: 1
+        } 
+        .metro-hover{
+            fill: rgba(253, 115, 0, 0.90);
+        }
+        .slider {
+            position: absolute;
+            top: 45px;
+            right: 190px;
+            width: 300px;
+        
+        }
+
+        #income-value {
+            position: absolute;
+            top: 65px;
+            right: 200px;
+            width: 300px;
+            color: #979797;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div id="map"></div>
+    <h1>US Per Capita Income 2014</h1>
+    <h2></h2>
+    <h3></h3>
+    
+    <input type="range" class="slider">
+    <div id="income-value"></div>
+        
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/0.9.0/simple_statistics.min.js"></script>    
+<script>
+
+    var width = 900, height = 600;
+    
+    var svg = d3.select("#map")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+    
+    var projection = d3.geo.albers()
+            .scale(1000)
+            .translate([width/2, height/2]);
+    
+    var geoPath = d3.geo.path()
+            .projection(projection);
+    
+    queue()
+        .defer(d3.json, 'us-states.json')
+        .defer(d3.json, 'na_land_clipped.json')
+        .defer(d3.csv, 'income_per_capita2014.csv')
+        .await(makeMap);
+    
+        function makeMap(error, counties, na, metros){
+            
+            var data = [];
+            
+            metros.forEach(function(metro) {
+                data.push(Number(metro.INCOME))
+            });
+            
+            var min = Math.min.apply(Math, data),
+                max = Math.max.apply(Math, data);
+        
+            var radius = d3.scale.sqrt()
+                .domain([min, max])
+                .range([3, 30])
+
+        console.log(metros)    
+
+        svg.append("g")
+            .selectAll("path")
+            .data(na.features)
+            .enter()
+            .append("path")
+            .attr("d", geoPath)
+            .attr("class", "land") 
+
+        svg.append("g")
+            .selectAll("path")
+            .data(counties.features)
+            .enter()
+            .append("path")
+            .attr("d", geoPath)
+            .attr("class", "county")
+            
+        var metrosIncome = svg.append("g")
+            .selectAll("circle")
+            .data(metros)
+            .sort(function(a,b){
+                return b.properties.INCOME - 
+                a.properties.INCOME;
+            })
+            .enter()
+            .append("circle")
+            .attr("cx",function(d){
+                d.position = projection([d.LON, d.LAT]);
+                if(d.position){
+                    return d.position[0];    
+                }else{
+                    console.log(d.position)
+                }
+            })
+            .attr("cy", function(d){
+                if(d.position){
+                return d.position[1];
+                }
+            })
+            .attr("r", function(d){
+                return radius(d.INCOME);
+            })
+            .attr("class", "metro")
+            .on("mouseover", function(d){
+                d3.select("h2").text(d.Metro);
+                d3.select("h3").text("$" + d.INCOME);
+                d3.select(this).attr('class', 'metro hover')
+            })
+            .on("mouseout", function(d){
+                d3.select("h2").text('');
+                d3.select("h3").text('');
+                d3.select(this).attr('class', 'metro');
+            });
+            
+        var output = d3.select("#income-value").text(max.toLocaleString());
+            
+        d3.select(".slider")
+            .attr("min", min)
+            .attr("max", max)
+            .attr("value", max)
+            .attr("step",(min-max)/300)
+            .on('input', function(){
+                update(this.value);
+        });
+            
+        function update(val){
+            output.text(Number(val).toLocaleString());
+            
+            metrosIncome.attr("display", function(d){
+                if(val <= Number(d.INCOME)){
+                    return "none";
+                }
+            })
+        }
+                        
+    }
+ 
+</script>
+</body>
+</html>
