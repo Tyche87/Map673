@@ -1,0 +1,232 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>US Economies 2001-2013</title>
+
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <style>
+        body {
+            padding: 60;
+            margin: 0;
+            background: whitesmoke;
+            font-family: Montserrat, sans-serif;
+        }
+        h1 {
+            position: absolute;
+            left: 190px;
+            top: 10px;
+            font-size: 2em;
+            font-weight: 100;
+            color: #979797;
+        }
+        h2 {
+            position: absolute;
+            left: 190px;
+            font-size: 1.5em;
+            font-weight: 100;
+            color: #979797;
+            top: 45px;
+            font-size; 1.2em;
+        }
+        h3{
+            position: absolute;
+            left: 190px;
+            font-weight: 100;
+            color: #979797;
+            top: 75px;
+            font-size: 1em;
+            
+        }
+        #map {
+            width: 100%;
+            height: 80%;
+            margin: 50px 150px 10px 0px;
+            opacity: .7;
+        }
+        .county{
+            fill: whitesmoke;
+            stroke: grey;
+        }
+
+        .land{
+            fill: #d3d3d3
+        }
+        .metro{
+            fill: rgba(253, 115, 0, 0.60);
+            stroke: #979797;
+            stroke-width: 1
+        } 
+        .metro-hover{
+            fill: rgba(253, 115, 0, 0.90);
+        }
+        
+        #ui-controls{
+            position: absolute;
+            width: 176px;
+            top: 108px;
+            right: 100px;
+            color: #979797;
+        }
+        #ui-controls .min{
+            float: left;
+        }
+        #ui-controls .max{
+            float: right;
+            margin-right: -15px;
+        }
+        .year-slider{
+            width: 100%;
+        }
+        .filter-slider{
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="map"></div>
+    <h1>What Makes-Up Metropolitan Economies Across the US?</h1>
+    <h2></h2>
+    <h3></h3>
+    
+    
+        
+    <div id="ui-controls">
+        <label><span class="min">2001</span><span class="max">2013</span>
+            <input type= "range" min = "2001", max = "2013",
+                   value = "2001", step= "1", class="year-slider">
+       
+            <input type= "range" class = "filter-slider">
+            
+                    
+        
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/0.9.0/simple_statistics.min.js"></script>    
+<script>
+
+    var width = 900, height = 600;
+    
+    var svg = d3.select("#map")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+    
+    var projection = d3.geo.albers()
+            .scale(1000)
+            .translate([width/2, height/2]);
+    
+    var geoPath = d3.geo.path()
+            .projection(projection);
+    
+    queue()
+        .defer(d3.json, 'us-states.json')
+        .defer(d3.json, 'na_land_clipped.json')
+        .defer(d3.csv, 'realGDP_metro_2001-2013.csv')
+        .await(makeMap);
+    
+        function makeMap(error, counties, na, metros){
+            
+            var data = [];
+            
+            metros.forEach(function(metro) {
+                data.push(Number(metro.FIN_2009))
+            });
+            
+            var min = Math.min.apply(Math, data),
+                max = Math.max.apply(Math, data);
+        
+            var radius = d3.scale.sqrt()
+                .domain([min, max])
+                .range([3, 75])
+
+        console.log(metros)    
+
+        svg.append("g")
+            .selectAll("path")
+            .data(na.features)
+            .enter()
+            .append("path")
+            .attr("d", geoPath)
+            .attr("class", "land") 
+
+        svg.append("g")
+            .selectAll("path")
+            .data(counties.features)
+            .enter()
+            .append("path")
+            .attr("d", geoPath)
+            .attr("class", "county")
+            
+        var metrosIncome = svg.append("g")
+            .selectAll("circle")
+            .data(metros)
+            .sort(function(a,b){
+                return b.properties.FIN_2009 - 
+                a.properties.FIN_2009;
+            })
+            .enter()
+            .append("circle")
+            .attr("cx",function(d){
+                d.position = projection([d.LON, d.LAT]);
+                if(d.position){
+                    return d.position[0];    
+                }else{
+                    console.log(d.position)
+                }
+            })
+            .attr("cy", function(d){
+                if(d.position){
+                return d.position[1];
+                }
+            })
+            .attr("r", function(d){
+                return radius(d.FIN_2009);
+            })
+            .attr("class", "metro")
+            .on("mouseover", function(d){
+                d3.select("h2").text(d.metro);
+                d3.select("h3").text("$" + d.FIN_2009);
+                d3.select(this).attr('class', 'metro hover')
+            })
+            .on("mouseout", function(d){
+                d3.select("h2").text('');
+                d3.select("h3").text('');
+                d3.select(this).attr('class', 'metro');
+            });
+            
+        var output = d3.select("#ui-controls .filter").text(max.toLocaleString());
+            
+        d3.select(".filter-slider")
+            .attr("min", min)
+            .attr("max", max)
+            .attr("value", max)
+            .attr("step",(min-max)/1000)
+            .on('input', function(){
+                update(this.value);
+        });
+            
+        d3.select(".filter-slider")
+            .attr("min", min)
+            .attr("max", max)
+            .attr("value", max)
+            .attr("step",(min-max)/1000)
+            .on('input', function(){
+                update(this.value);
+        });    
+            
+        function update(val){
+            output.text(Number(val).toLocaleString());
+            
+            metrosIncome.attr("display", function(d){
+                if(val <= Number(d.FIN_2009)){
+                    return "none";
+                }
+            })
+        }
+                        
+    }
+ 
+</script>
+</body>
+</html>
