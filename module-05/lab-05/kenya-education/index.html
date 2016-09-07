@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>2014 Kenyan Enrollment</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <link href='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.css' rel='stylesheet' />
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+    <link href='css/styles.css' rel='stylesheet' />
+
+</head>
+<body>
+    
+<div id='side-panel'>
+    <h1>Student Attrition Rates in Kenya</h1>
+    <h2>2014 enrollment rates for boys and girls</h2>
+    <p><img src="images/legend3.png" alt="legend"></p>
+    <h2>About this map:</h2>
+    <p>Compare enrollment rates across Kenyan Counties as according to Kenya Open Data: <a href="https://opendata.go.ke">See or Browse Data</a></p>
+    <p>Color coded markers denote enrollment data by gender. View data across grades 1 though 8 using slider to compare attendance gaps between girls and boys.</p>
+</div>
+<div id='map'></div>
+<div id="ui-slider">
+    <input type="range" min="1" max="8" value="1" step="1" class="slider"> 
+</div>
+<div id="grade">Grade: <span>1</span></div>
+<div id="legend">
+    <h3>2014 Enrollments By County</h3>
+    <svg class="legend" width="200" height="200"></svg>
+</div>
+<div id="info">
+    <p>County: <span></span></p>
+    <p class='girls'>girls <span></span>: <span></span></p>
+    <p class='boys'>boys <span></span>: <span></span></p>
+</div>
+    
+<script src='https://api.mapbox.com/mapbox.js/v2.2.4/mapbox.js'></script>
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+<script src='https://code.jquery.com/jquery-1.12.0.min.js'></script>
+<script src='https://npmcdn.com/simple-statistics@2.0.0/dist/simple-statistics.min.js'></script> 
+<script src='js/app.js'></script>
+</body>
+</html>
